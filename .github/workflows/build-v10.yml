@@ -1,0 +1,45 @@
+name: Build NUTRI V10 REI Gate
+
+on:
+  push:
+    branches: [ v10-character-core ]
+    paths:
+      - 'native-v10/**'
+      - '.github/workflows/build-v10.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'native-v10/**'
+      - '.github/workflows/build-v10.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: native-v10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Restore REI master asset
+        run: |
+          mkdir -p app/src/main/res/drawable-nodpi
+          cat asset_parts/rei_*.b64 | tr -d '\n\r' | base64 -d > app/src/main/res/drawable-nodpi/rei_master.webp
+          test -s app/src/main/res/drawable-nodpi/rei_master.webp
+      - name: Build debug APK
+        run: gradle :app:assembleDebug --stacktrace
+      - name: Rename APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk NUTRI-V10-REI-GATE.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NUTRI-V10-REI-GATE
+          path: native-v10/NUTRI-V10-REI-GATE.apk
+          if-no-files-found: error
