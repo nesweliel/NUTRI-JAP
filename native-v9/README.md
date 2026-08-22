@@ -13,3 +13,5 @@ Android-native nutrition companion/game build designed for BlueStacks and physic
 
 ## Install
 Install `NUTRI-V9-BLUESTACKS.apk` in BlueStacks by dragging the APK into the emulator window or using **Install APK**.
+
+Build trigger: V9 native package.
